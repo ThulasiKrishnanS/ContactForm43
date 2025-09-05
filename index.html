@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact Form</title>
+</head>
+<body>
+  <h2>Contact Form</h2>
+  <form id="contactForm">
+    <input type="text" id="name" placeholder="Enter name" required><br><br>
+    <input type="text" id="contact" placeholder="Enter contact number" required><br><br>
+    <button type="submit">Save</button>
+  </form>
+
+  <h3>Stored Contacts:</h3>
+  <ul id="contactList"></ul>
+
+  <script>
+    const form = document.getElementById('contactForm');
+    const contactList = document.getElementById('contactList');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const contact = document.getElementById('contact').value;
+
+      await fetch('http://localhost:3000/add-contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, contact })
+      });
+
+      form.reset();
+      loadContacts();
+    });
+
+    async function loadContacts() {
+      const res = await fetch('http://localhost:3000/contacts');
+      const data = await res.json();
+      contactList.innerHTML = '';
+      data.forEach(c => {
+        const li = document.createElement('li');
+        li.textContent = `${c.name} - ${c.contact}`;
+        contactList.appendChild(li);
+      });
+    }
+
+    // Load contacts on page load
+    loadContacts();
+  </script>
+</body>
+</html>
